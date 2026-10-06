@@ -1,0 +1,6 @@
+{
+  "name": "Tender Package Builder",
+  "description": "Enterprise in-browser procurement tender package builder: validate requirements, detect duplicate & expired documents, and generate official ordered submission PDFs.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
