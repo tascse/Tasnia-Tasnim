@@ -1,581 +1,352 @@
-# 📄 Tender Package Builder
+# Tender Package Builder
 
-> **Turn a collection of tender documents into one complete, validated, correctly ordered submission package.**
-
-Tender Package Builder is a **frontend-only document processing web application** designed to help organizations prepare tender submissions safely and efficiently.
-
-It allows office staff to load tender requirements, upload PDF documents, match files to requirements, detect duplicates, validate expiry dates, identify missing documents, and generate a final submission-ready PDF package — entirely inside the browser.
+A frontend-only web application that helps bidders prepare a complete tender submission package by uploading, matching, validating, ordering, and combining required PDF documents into one final submission-ready PDF.
 
 ---
 
-## 🎯 The Problem
+## 👤 Participant Information
 
-Preparing tender documents manually can be error-prone.
+Name: Tasnia Tasnim
 
-A tender may require:
+### 🌐 Public HTTPS Live Link
 
-* Trade License
-* TIN Certificate
-* VAT Certificate
-* Bank Solvency Letter
-* Experience Certificates
-* Technical Proposal
-* Financial Proposal
-* Other supporting documents
-
-Some documents are mandatory, some are optional, and some must remain valid on the tender submission date.
-
-A single mistake — such as a missing document, expired certificate, duplicate file, or incorrect document order — can make a submission incomplete or potentially lead to rejection.
-
-### Tender Package Builder solves this by providing a guided workflow:
-
-**Load Requirements → Upload PDFs → Match Documents → Validate → Review → Generate Package**
+**Live Application:** https://tasnia-tasnim.vercel.app/
 
 ---
 
-## ✨ Features
+## 📌 Problem
 
-### 📋 Tender Requirement Management
+Preparing tender documents manually can be error-prone. A bidder may accidentally miss a mandatory document, upload duplicate files, submit an expired certificate, place documents in the wrong order, or forget to include an important document in the final package.
 
-* Load `requirements.json`
-* Display tender information
-* Automatically sort requirements by their specified order
-* Support mandatory and optional documents
-* Support documents with and without expiry dates
-* Dynamically handle unseen tender requirements
+Tender Package Builder is designed to reduce these mistakes by checking the uploaded documents against the tender requirements before generating the final submission package.
 
-### 📁 PDF Upload
+---
 
-* Upload multiple PDF files
-* Maximum 30 files
-* Maximum 50 MB total
-* Display filename and page count
-* Remove uploaded files
-* Reject non-PDF files
-* Handle corrupted or password-protected PDFs safely
+## 🚀 Main Features Done
 
-### 🔗 Document Matching
+### 1. Tender Requirements Loading
 
-* Match uploaded PDFs to tender requirements
-* One requirement can have at most one file
-* One file can be assigned to at most one requirement
-* Change or remove matches at any time
-* Optional filename-based match suggestions
+* Loads `requirements.json`
+* Displays tender ID
+* Tender title
+* Procuring entity
+* Bidder name
+* Submission deadline
+* Required documents sorted by their defined `order`
 
-### 🔍 Duplicate Detection
+### 2. Multiple PDF Upload
 
-Uploaded PDFs are checked using **SHA-256 content hashing**.
+* Upload multiple PDF files at once
+* Displays uploaded filenames
+* Displays page counts
+* Allows individual files to be removed
+* Rejects non-PDF files
+* Handles invalid or unreadable PDF files with error messages
+* Supports the defined maximum file limits
 
-This means files are identified as duplicates based on their actual content rather than their filenames.
+### 3. Document Matching
 
-For example:
+* Matches each uploaded PDF to a tender requirement
+* One requirement can have only one matched file
+* One uploaded file can be matched to only one requirement
+* Allows users to change or undo a match
+* Provides clear visual indication of matched and unmatched documents
 
-```text
-bank-solvency.pdf
-bank-solvency-copy.pdf
-```
+### 4. Expiry Date Validation
 
-If both files contain exactly the same data, the application identifies them as duplicates even though their filenames are different.
+For requirements where `has_expiry` is enabled:
 
-Duplicate files cannot be used as separate documents for different requirements.
+* User can enter the document expiry date
+* The system compares the expiry date with the tender submission deadline
+* Expired documents are automatically identified
+* A document expiring exactly on the submission deadline is considered valid
 
-### 📅 Expiry Validation
+### 5. Requirement Status System
 
-For documents requiring expiry validation, users can enter the document's expiry date.
+Each requirement has exactly one current status:
 
-The application compares it with the tender submission deadline.
+| Status                 | Meaning                                         |
+| ---------------------- | ----------------------------------------------- |
+| **Missing**            | Mandatory document has not been provided        |
+| **Expiry Date Needed** | Document is matched but expiry date is required |
+| **Expired**            | Document expires before the submission deadline |
+| **Not Provided**       | Optional document was not provided              |
+| **OK**                 | Requirement has been successfully satisfied     |
 
-For example:
+Blocking issues are clearly identified before package generation.
 
-```text
-Submission deadline: 20 October 2026
-Document expiry:     20 October 2026
+### 6. Exact Duplicate Detection
 
-Result: ✓ OK
-```
+The application detects exact duplicate PDF files based on their actual file content rather than only their filenames.
 
-A document expiring on the submission deadline is considered valid.
+Therefore, two identical PDFs with different filenames are still recognized as duplicates.
 
-### 🚦 Real-Time Status Checking
+Duplicate documents cannot be incorrectly assigned to different requirements.
 
-Every requirement receives exactly one status:
+### 7. Package Validation
 
-| Status                | Meaning                                     | Blocks Package |
-| --------------------- | ------------------------------------------- | -------------- |
-| ❌ Missing             | Mandatory document has no matched file      | Yes            |
-| ⚠️ Expiry date needed | Required expiry date has not been entered   | Yes            |
-| 🔴 Expired            | Document expires before submission deadline | Yes            |
-| ○ Not provided        | Optional document has no matched file       | No             |
-| ✅ OK                  | Requirement has been satisfied              | No             |
+The **Generate Package** action remains unavailable while blocking issues exist.
 
-Statuses update immediately whenever the user changes the documents, matches, or expiry dates.
+The user must resolve all blocking requirements before generating the final package.
 
-### 📦 PDF Package Generation
+### 8. Automatic PDF Package Generation
 
-When all blocking issues are resolved, the application generates one combined PDF.
-
-The package contains:
+The final package contains:
 
 1. English cover page
-2. Included documents in the required order
-3. All original pages from each selected PDF
-4. Page footer on every page
+2. Included tender documents
+3. Documents arranged according to the requirement `order`
+4. All pages of each original PDF in their original order
+5. Footer on every page
 
 Footer format:
 
-```text
-<TENDER_ID> | Page X of Y
-```
+`<Tender ID> | Page X of Y`
 
-Example:
+The final file is automatically named:
 
-```text
-T-2026-0417 | Page 7 of 18
-```
+`<tender_id>_Package.pdf`
 
-The final file is downloaded as:
+### 9. English / Bangla Interface
 
-```text
-<TENDER_ID>_Package.pdf
-```
+The application supports switching the interface between:
 
----
+* English
+* বাংলা
 
-## 🌐 Bilingual Interface
+Document names use:
 
-The application supports:
-
-* 🇬🇧 English
-* 🇧🇩 বাংলা
-
-The document names shown in the interface are dynamically selected from:
-
-```text
-title_en
-```
-
-or
-
-```text
-title_bn
-```
-
-depending on the selected language.
-
-The generated PDF cover remains in **English**, as required by the competition specification.
+* `title_en` in English mode
+* `title_bn` in Bangla mode
 
 ---
 
-## 🔒 Privacy First
+## ⭐ Bonus Features
 
-Tender documents can contain sensitive business information.
+The following additional features were considered/implemented where applicable:
 
-For this reason, the application is completely frontend-only.
-
-### Documents are processed locally in the browser.
-
-There is:
-
-* ❌ No backend
-* ❌ No database
-* ❌ No document upload server
-* ❌ No cloud document storage
-* ❌ No external document-processing service
-
-PDF files remain on the user's device during processing.
-
----
-
-## 🏗️ Architecture
-
-```text
-                    ┌──────────────────────┐
-                    │   requirements.json  │
-                    └──────────┬───────────┘
-                               │
-                               ▼
-                    ┌──────────────────────┐
-                    │   Tender Loader       │
-                    └──────────┬───────────┘
-                               │
-                               ▼
-┌──────────────┐     ┌──────────────────────┐
-│ PDF Files    │────▶│ Document Manager     │
-└──────────────┘     └──────────┬───────────┘
-                                │
-                     ┌──────────┴──────────┐
-                     ▼                     ▼
-             ┌──────────────┐     ┌────────────────┐
-             │ PDF.js       │     │ SHA-256 Hashing│
-             │ Page Count   │     │ Duplicate Check│
-             └──────────────┘     └────────────────┘
-                     │
-                     ▼
-             ┌──────────────────┐
-             │ Matching Engine  │
-             └────────┬─────────┘
-                      │
-                      ▼
-             ┌──────────────────┐
-             │ Validation Engine│
-             └────────┬─────────┘
-                      │
-              ┌───────┴────────┐
-              ▼                ▼
-        Blocking Issues     Ready
-              │                │
-              │                ▼
-              │       ┌──────────────────┐
-              │       │ PDF Package      │
-              │       │ Generator        │
-              │       └────────┬─────────┘
-              │                │
-              └────────────────┤
-                               ▼
-                     <Tender_ID>_Package.pdf
-```
+* Automatic filename-based document matching
+* Tender package review before generation
+* PDF page counting
+* Local browser processing
+* Exact duplicate detection using SHA-256 hashing
+* Responsive interface
+* Clear validation feedback
+* English/Bangla localization
+* Error handling for invalid PDF files
+* Professional document-processing workflow
+* No participant-controlled backend or online document storage
 
 ---
 
 ## 🛠️ Technology Stack
 
-| Technology      | Purpose                            |
-| --------------- | ---------------------------------- |
-| React           | User interface                     |
-| TypeScript      | Type-safe application logic        |
-| Vite            | Development and build tooling      |
-| Tailwind CSS    | UI styling                         |
-| pdf.js          | PDF reading and page counting      |
-| pdf-lib         | PDF merging and package generation |
-| Web Crypto API  | SHA-256 duplicate detection        |
-| File API        | Local file processing              |
-| Browser Storage | Optional local project persistence |
+* React
+* TypeScript
+* Vite
+* Tailwind CSS
+* pdf-lib
+* PDF.js
+* Web Crypto API
+* Browser File API
 
 ---
 
-## 📂 Project Structure
+## 🔒 Privacy
 
-```text
-tender-package-builder/
-│
-├── public/
-│
-├── src/
-│   ├── components/
-│   │   ├── common/
-│   │   ├── layout/
-│   │   ├── tender/
-│   │   ├── upload/
-│   │   ├── matching/
-│   │   ├── review/
-│   │   └── package/
-│   │
-│   ├── hooks/
-│   │   ├── useTender.ts
-│   │   ├── useDocuments.ts
-│   │   ├── useMatching.ts
-│   │   ├── useValidation.ts
-│   │   └── useLanguage.ts
-│   │
-│   ├── services/
-│   │   ├── pdfService.ts
-│   │   ├── duplicateService.ts
-│   │   ├── validationService.ts
-│   │   ├── packageService.ts
-│   │   └── storageService.ts
-│   │
-│   ├── types/
-│   │   ├── tender.ts
-│   │   └── document.ts
-│   │
-│   ├── i18n/
-│   │   ├── en.ts
-│   │   └── bn.ts
-│   │
-│   ├── utils/
-│   │   ├── dateUtils.ts
-│   │   └── fileUtils.ts
-│   │
-│   ├── App.tsx
-│   └── main.tsx
-│
-├── output/
-│   └── <tender_id>_Package.pdf
-│
-├── screenshots/
-│
-├── package.json
-├── tsconfig.json
-├── vite.config.ts
-└── README.md
-```
+The application is designed as a frontend-only application.
+
+Tender documents are processed locally in the browser rather than being uploaded to a participant-controlled backend or database.
+
+This helps keep sensitive tender documents on the user's device during the document preparation process.
 
 ---
 
-## 🚀 Getting Started
+## ▶️ How to Run the App
 
 ### Prerequisites
 
-Make sure you have installed:
+Make sure the following are installed:
 
 * Node.js
 * npm
-* Google Chrome
+* Git
 
-### Installation
-
-Clone the repository:
+### 1. Clone the repository
 
 ```bash
-git clone <YOUR_REPOSITORY_URL>
+git clone <YOUR_GITHUB_REPOSITORY_URL>
+cd <PROJECT_FOLDER>
 ```
 
-Navigate to the project:
-
-```bash
-cd tender-package-builder
-```
-
-Install dependencies:
+### 2. Install dependencies
 
 ```bash
 npm install
 ```
 
-Start the development server:
+### 3. Start the development server
 
 ```bash
 npm run dev
 ```
 
-Open the local URL shown by Vite in Google Chrome.
-
----
-
-## 🧪 How to Use
-
-### 1. Load Tender Requirements
-
-Select:
+The terminal will provide a local development URL, usually:
 
 ```text
-requirements.json
+http://localhost:5173
 ```
 
-The application loads the tender details and required document checklist.
+### 4. Build for production
 
-### 2. Upload Documents
-
-Upload the available PDF documents.
-
-The application automatically:
-
-* counts pages
-* validates file type
-* checks file limits
-* calculates content hashes
-* detects duplicates
-
-### 3. Match Documents
-
-Assign each uploaded PDF to its corresponding tender requirement.
-
-### 4. Enter Expiry Dates
-
-For documents where:
-
-```json
-"has_expiry": true
+```bash
+npm run build
 ```
 
-enter the document's expiry date.
+### 5. Preview the production build
 
-### 5. Review Status
+```bash
+npm run preview
+```
 
-Resolve every blocking issue.
+---
 
-The package can only be generated when there are no blocking statuses.
-
-### 6. Generate Package
-
-Click:
+## 📋 Example Workflow
 
 ```text
-Generate Package
+Load Tender Requirements
+        ↓
+Upload PDF Documents
+        ↓
+Match Documents
+        ↓
+Enter Expiry Dates
+        ↓
+Validate Requirements
+        ↓
+Resolve Blocking Issues
+        ↓
+Review Package
+        ↓
+Generate Final PDF
+        ↓
+Download Tender Package
 ```
 
-The application creates the final combined PDF.
+---
 
-### 7. Download
+## 🤖 AI Tools Used
 
-The generated package follows:
+AI assistance was used during development for:
+
+* Application architecture planning
+* UI/UX design ideas
+* React and TypeScript implementation assistance
+* PDF processing logic
+* Requirement validation logic
+* Duplicate detection approach
+* Error handling
+* Debugging and troubleshooting
+* README/documentation preparation
+* Improving usability and bilingual interface design
+
+### AI Tool
+
+**Google AI Studio / Gemini**
+
+AI was used as a development assistant. The final application logic, integration, testing, debugging, and project decisions were reviewed and adapted during development.
+
+---
+
+## 💡 Most Useful AI Prompt
+
+The most useful prompt used during development was a detailed implementation prompt describing the complete tender workflow, validation rules, PDF generation rules, duplicate detection, bilingual interface, and browser-only processing requirements.
+
+### Prompt
+
+> Build a production-quality frontend-only Tender Package Builder using React, TypeScript, Vite, Tailwind CSS, pdf-lib, pdf.js, and the browser Web Crypto API.
+>
+> The application must load a requirements.json file containing tender information and an ordered list of required documents. Users must be able to upload multiple PDFs, see filenames and page counts, remove files, and match each uploaded PDF to exactly one requirement. Each requirement may have at most one document.
+>
+> Implement a centralized validation system with exactly these statuses: Missing, Expiry Date Needed, Expired, Not Provided, and OK.
+>
+> Mandatory requirements without a matched file must be Missing and block package generation. Optional requirements without a file must be Not Provided and must not block generation. If a matched requirement has has_expiry=true, require an expiry date. If the expiry date is before the tender submission deadline, mark it Expired and block generation. If the expiry date equals the deadline, mark it OK.
+>
+> Implement exact duplicate detection using SHA-256 hashing of the actual PDF file content so that identical PDFs with different filenames are still detected as duplicates. Do not allow duplicate files to satisfy different requirements.
+>
+> The Generate Package button must remain disabled while any blocking requirement exists.
+>
+> When generation is allowed, create one combined PDF using pdf-lib. The first page must be an English cover page containing the tender ID, tender title, procuring entity, bidder name, submission deadline, package creation date, and included documents in requirement order. Then append every matched document in the exact requirement order while preserving every original page and page order.
+>
+> Add a readable footer to every page, including the cover: "<tender_id> | Page X of Y". Ensure the footer never overlaps the original document content.
+>
+> The final file must automatically download as "<tender_id>_Package.pdf".
+>
+> Add a complete English/Bangla interface switch. Use title_en for English and title_bn for Bangla. The generated cover remains English.
+>
+> The application must process documents locally in the browser and must not require a backend, Firebase, Supabase, or online document storage.
+>
+> Make the interface feel like a professional enterprise/government document-processing application rather than a generic SaaS dashboard. Prioritize clarity, validation visibility, accessibility, responsive design, meaningful empty states, loading states, and clear error messages.
+>
+> Build the actual working application rather than only providing architecture or pseudocode. Test the complete workflow and resolve TypeScript/build errors before finishing.
+
+---
+
+## ⚠️ Known Problems
+
+* The application currently depends on the browser environment for local PDF processing.
+* Very large or severely damaged PDF files may take longer to process or may fail if the browser cannot parse them.
+* Password-protected PDFs may not be readable by the application.
+* PDF rendering and generation performance can depend on the user's device and browser.
+* The live deployment may occasionally be affected by hosting or network availability.
+
+---
+
+## 📁 Project Structure
 
 ```text
-<TENDER_ID>_Package.pdf
+src/
+├── components/
+│   ├── layout/
+│   ├── tender/
+│   ├── upload/
+│   ├── matching/
+│   ├── review/
+│   ├── package/
+│   └── common/
+│
+├── hooks/
+│   ├── useTender
+│   ├── useDocuments
+│   ├── useMatching
+│   ├── useValidation
+│   └── useLanguage
+│
+├── services/
+│   ├── pdfService
+│   ├── duplicateService
+│   ├── validationService
+│   └── packageService
+│
+├── types/
+├── i18n/
+├── utils/
+└── App.tsx
 ```
 
 ---
 
-## 📄 Requirements Format
+## 🎯 Project Goal
 
-The application accepts the following structure:
+The goal of Tender Package Builder is to make tender document preparation safer, faster, and easier by transforming a collection of PDF files into a validated, correctly ordered, submission-ready tender package.
 
-```json
-{
-  "tender": {
-    "tender_id": "T-2026-0417",
-    "title": "Supply of IT Equipment",
-    "procuring_entity": "Example Directorate",
-    "bidder": "Example Company Ltd.",
-    "submission_deadline": "2026-10-20"
-  },
-  "requirements": [
-    {
-      "id": "R01",
-      "order": 1,
-      "title_en": "Trade License",
-      "title_bn": "ট্রেড লাইসেন্স",
-      "mandatory": true,
-      "has_expiry": true
-    }
-  ]
-}
-```
-
-The application does not depend on the sample tender.
-
-It dynamically processes the supplied requirements and PDF files.
+Instead of manually checking dozens of documents, the user can rely on the application to identify missing documents, expiry problems, duplicates, and ordering issues before generating the final package.
 
 ---
 
-## 📦 Package Rules
-
-The generated PDF follows these rules:
-
-### Page 1
-
-English cover page containing:
-
-* Tender ID
-* Tender title
-* Procuring entity
-* Bidder name
-* Submission deadline
-* Package creation date
-* Included document list
-
-### Following Pages
-
-Documents are included according to:
-
-```text
-requirement.order
-```
-
-All pages from each selected PDF are preserved in their original order.
-
-Optional documents without a matched file are skipped.
-
-### Footer
-
-Every page contains:
-
-```text
-<TENDER_ID> | Page X of Y
-```
-
-Where `Y` is the total number of pages in the final package.
-
----
-
-## 🎁 Bonus Features
-
-Where implemented, the application also supports:
-
-* 📑 Package index page
-* ✍️ Seal/signature placement
-* 📊 CSV checklist export
-* 💾 Save and reopen projects
-* 🤖 Filename-based auto-match suggestions
-* 👁️ PDF previews
-* 🌐 Bangla interface
-
-Core tender validation and PDF generation remain the primary focus.
-
----
-
-## 🧠 Design Philosophy
-
-Tender Package Builder follows four principles:
-
-### 1. Prevent mistakes
-
-The application should catch problems before submission.
-
-### 2. Make the next action obvious
-
-Users should never have to wonder what to do next.
-
-### 3. Never hide a blocking issue
-
-If something prevents package generation, the application clearly explains why.
-
-### 4. Keep sensitive documents local
-
-Tender documents should not need to leave the user's browser.
-
----
-
-## 🧪 Validation Scenarios
-
-The application is designed to handle:
-
-* Missing mandatory documents
-* Missing optional documents
-* Missing expiry dates
-* Expired documents
-* Documents expiring exactly on the submission deadline
-* Exact duplicate PDFs
-* Non-PDF uploads
-* Corrupted PDFs
-* Password-protected PDFs
-* More than 30 files
-* More than 50 MB total upload size
-* Arbitrary requirement ordering
-* Different tender IDs and deadlines
-* English and Bangla interfaces
-
----
-
-## 🏆 Competition Context
-
-This project was developed for the **AI DevFest Tender Package Builder challenge**.
-
-The application is designed around the official problem requirements, with particular focus on:
-
-* Correct document status detection
-* Exact duplicate detection
-* Correct PDF ordering
-* Accurate page numbering
-* Mandatory/optional document handling
-* Expiry validation
-* Frontend-only document processing
-* Simple workflow for non-technical office staff
-
----
-
-## 👥 Team
+## 📄 Competition Submission
 
 **Project:** Tender Package Builder
-
-**Built for:** AI DevFest Competition
-
-**Development approach:** AI-assisted frontend development + manual engineering and testing
-
----
-
-## 📜 License
-
-This project was created for competition purposes.
-
-Refer to the repository or competition rules for usage and distribution details.
+**Participant:** Tasnia Tasnim
+**Live Application:** https://tasnia-tasnim.vercel.app/
+**Repository:** `<YOUR_PUBLIC_GITHUB_REPOSITORY_URL>`
